@@ -43,6 +43,9 @@ namespace UABEAvalonia
 
         private DataGridCollectionView dgcv;
 
+        // 添加一个变量来保存当前的关键字搜索文本
+        private string currentSearchText = string.Empty;
+
         //for preview
         public InfoWindow()
         {
@@ -87,26 +90,41 @@ namespace UABEAvalonia
 
         private void SearchBox_TextChanged(object? sender, TextChangedEventArgs e)
         {
-            string searchText = searchBox.Text?.ToLower() ?? string.Empty;
-            var filter = new Func<object, bool>(item =>
-            {
-                if (string.IsNullOrEmpty(searchText))
-                    return true;
-
-                var gridItem = (AssetInfoDataGridItem)item;
-                return gridItem.Name.ToLower().Contains(searchText) ||
-                       gridItem.Type.ToLower().Contains(searchText) ||
-                       gridItem.Container.ToLower().Contains(searchText);
-            });
-
-            dgcv.Filter = null; // 清除旧过滤器
-            dgcv.Filter = filter;
+            currentSearchText = searchBox.Text?.ToLower() ?? string.Empty;
+            ApplyCombinedFilters();
         }
 
         private void ClearSearchBtn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
             searchBox.Text = string.Empty;
-            dgcv.Filter = null;
+            currentSearchText = string.Empty;
+            ApplyCombinedFilters();
+        }
+
+        // 实现组合过滤方法，同时应用类型过滤和关键字过滤
+        private void ApplyCombinedFilters()
+        {
+            var filter = new Func<object, bool>(item => 
+            {
+                var gridItem = (AssetInfoDataGridItem)item;
+                
+                // 首先检查类型过滤
+                if (filteredOutTypeIds.Contains(gridItem.TypeClass))
+                    return false;
+                
+                // 然后检查关键字过滤
+                if (!string.IsNullOrEmpty(currentSearchText))
+                {
+                    return gridItem.Name.ToLower().Contains(currentSearchText) ||
+                           gridItem.Type.ToLower().Contains(currentSearchText) ||
+                           gridItem.Container.ToLower().Contains(currentSearchText);
+                }
+                
+                return true;
+            });
+
+            dgcv.Filter = null; // 清除旧过滤器
+            dgcv.Filter = filter;
         }
 
         private void InfoWindow_KeyDown(object? sender, KeyEventArgs e)
@@ -216,9 +234,7 @@ namespace UABEAvalonia
             FilterAssetTypeDialog dialog = new FilterAssetTypeDialog(filteredOutTypeIds, usedIds);
             filteredOutTypeIds = await dialog.ShowDialog<HashSet<AssetClassID>>(this);
 
-            var filter = new Func<object, bool>(item => !filteredOutTypeIds.Contains(((AssetInfoDataGridItem)item).TypeClass));
-            dgcv.Filter = null; // avalonia bug? idk, doesn't update the filter without doing this
-            dgcv.Filter = filter;
+            ApplyCombinedFilters();
         }
 
         private void MenuHierarchy_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
