@@ -7,20 +7,20 @@
         Icon="/Assets/uabeavalonia16.ico"
         CanResize="False"
         x:Class="UABEAvalonia.About"
-        Title="About Unity Assets Bundle Extractor Avalonia"
+        Title="关于 Unity Assets Bundle Extractor Avalonia"
         WindowStartupLocation="CenterOwner">
   <Grid Margin="10,10,10,10">
     <StackPanel Orientation="Vertical">
       <Image Source="/Assets/uabeavalonia64.png" HorizontalAlignment="Left" Width="64" Height="64" />
       <TextBlock>
-Remake of DerPopo's UABE in C# w/ Avalonia<LineBreak/>
-Most code ported from UABE.NET<LineBreak/>
+DerPopo的UABE的C# Avalonia重制版<LineBreak/>
+大部分代码从UABE.NET移植<LineBreak/>
 <LineBreak/>
 https://github.com/DerPopo/UABE<LineBreak/>
 https://github.com/nesrak1/UABEA<LineBreak/>
 https://github.com/nesrak1/AssetsTools.NET
       </TextBlock>
-      <Button Content="OK" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="30" Width="70" Name="btnOk" />
+      <Button Content="确定" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="30" Width="70" Name="btnOk" />
     </StackPanel>
   </Grid>
 </Window>

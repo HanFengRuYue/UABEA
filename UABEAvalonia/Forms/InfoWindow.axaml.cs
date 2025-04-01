@@ -78,7 +78,35 @@ namespace UABEAvalonia
             dataGrid.SelectionChanged += DataGrid_SelectionChanged;
             Closing += InfoWindow_Closing;
 
+            // 添加搜索框事件
+            searchBox.TextChanged += SearchBox_TextChanged;
+            clearSearchBtn.Click += ClearSearchBtn_Click;
+
             ignoreCloseEvent = false;
+        }
+
+        private void SearchBox_TextChanged(object? sender, TextChangedEventArgs e)
+        {
+            string searchText = searchBox.Text?.ToLower() ?? string.Empty;
+            var filter = new Func<object, bool>(item =>
+            {
+                if (string.IsNullOrEmpty(searchText))
+                    return true;
+
+                var gridItem = (AssetInfoDataGridItem)item;
+                return gridItem.Name.ToLower().Contains(searchText) ||
+                       gridItem.Type.ToLower().Contains(searchText) ||
+                       gridItem.Container.ToLower().Contains(searchText);
+            });
+
+            dgcv.Filter = null; // 清除旧过滤器
+            dgcv.Filter = filter;
+        }
+
+        private void ClearSearchBtn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            searchBox.Text = string.Empty;
+            dgcv.Filter = null;
         }
 
         private void InfoWindow_KeyDown(object? sender, KeyEventArgs e)
